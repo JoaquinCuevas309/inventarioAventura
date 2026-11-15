@@ -93,6 +93,20 @@ class PermisosTest(BaseTest):
         self.assertEqual(respuesta.status_code, 403)
         self.assertTrue(Experiencia.objects.filter(pk=self.exp1.pk).exists())
 
+    def test_acceso_denegado_usa_la_pagina_403_en_espanol(self):
+        self.ingresar(self.turista1)
+        respuesta = self.client.get(reverse('categoria_lista'))
+        self.assertEqual(respuesta.status_code, 403)
+        self.assertTemplateUsed(respuesta, '403.html')
+        self.assertContains(respuesta, 'Acceso denegado', status_code=403)
+
+    def test_los_desplegables_usan_etiquetas_en_espanol(self):
+        self.ingresar(self.admin)
+        respuesta = self.client.get(reverse('inscripcion_crear'))
+        self.assertContains(respuesta, 'Seleccione un turista')
+        self.assertContains(respuesta, 'Seleccione una experiencia')
+        self.assertNotContains(respuesta, 'Select an option')
+
     def test_guia_no_ve_boton_eliminar(self):
         self.ingresar(self.guia1)
         respuesta = self.client.get(reverse('experiencia_lista'))
@@ -479,6 +493,14 @@ class SuperusuarioTest(BaseTest):
         self.ingresar(self.admin)
         respuesta = self.client.get(reverse('usuario_lista'))
         self.assertNotIn(self.superusuario, list(respuesta.context['usuarios']))
+
+    def test_admin_de_la_aplicacion_no_gestiona_cuentas_con_acceso_staff(self):
+        personal = Usuario.objects.create_user('staff1', password='clave12345', rol='guia', is_staff=True)
+        self.ingresar(self.admin)
+        respuesta = self.client.post(reverse('usuario_borrar', args=[personal.pk]))
+        self.assertEqual(respuesta.status_code, 404)
+        self.assertEqual(self.client.get(reverse('usuario_actualizar', args=[personal.pk])).status_code, 404)
+        self.assertNotIn(personal, list(self.client.get(reverse('usuario_lista')).context['usuarios']))
 
     def test_superusuario_si_gestiona_superusuarios(self):
         otro = Usuario.objects.create_superuser('super2', password='clave12345')

@@ -40,6 +40,7 @@ class ExperienciaForm(BootstrapMixin, forms.ModelForm):
         if self.instance.pk:
             condicion |= Q(pk=self.instance.categoria_id)
         self.fields['categoria'].queryset = Categoria.objects.filter(condicion)
+        self.fields['categoria'].empty_label = 'Seleccione una categoria'
 
     def clean_fecha_hora(self):
         fecha = self.cleaned_data['fecha_hora']
@@ -64,6 +65,8 @@ class InscripcionForm(BootstrapMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['usuario'].queryset = Usuario.objects.filter(rol='turista')
+        self.fields['usuario'].empty_label = 'Seleccione un turista'
+        self.fields['experiencia'].empty_label = 'Seleccione una experiencia'
 
     def clean_experiencia(self):
         experiencia = self.cleaned_data['experiencia']

@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, TemplateView, UpdateView
 
@@ -43,7 +44,7 @@ class UsuariosGestionablesMixin:
     def get_queryset(self):
         consulta = Usuario.objects.all()
         if not self.request.user.is_superuser:
-            consulta = consulta.exclude(is_superuser=True)
+            consulta = consulta.exclude(Q(is_superuser=True) | Q(is_staff=True))
         return consulta
 
 
