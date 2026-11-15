@@ -48,4 +48,4 @@ RUTAS PRINCIPALES
 /categorias/           Gestion de categorias (administrador)
 /experiencias/         Gestion de experiencias (administrador y guia)
 /reservas/             Gestion de reservas (administrador) y reservas de sus grupos (guia)
-/mis-reservas/         Historial de reservas (turista)
+/mis-reservas/         Historial de reservas y cancelacion de reservas con pago pendiente (turista)

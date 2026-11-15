@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.db import connection
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
@@ -443,3 +445,114 @@ class SesionYRegistroTest(BaseTest):
     def test_login_redirige_al_panel(self):
         respuesta = self.client.post(reverse('login'), {'username': 'guia1', 'password': 'clave12345'})
         self.assertRedirects(respuesta, reverse('panel'))
+
+
+class SuperusuarioTest(BaseTest):
+    def setUp(self):
+        super().setUp()
+        self.superusuario = Usuario.objects.create_superuser('super1', password='clave12345')
+
+    def test_admin_de_la_aplicacion_no_edita_superusuarios(self):
+        self.ingresar(self.admin)
+        respuesta = self.client.post(reverse('usuario_actualizar', args=[self.superusuario.pk]), {
+            'username': 'super1',
+            'first_name': 'Super',
+            'last_name': 'Usuario',
+            'email': 'super@correo.cl',
+            'telefono': '',
+            'rol': 'admin',
+            'is_active': 'on',
+            'password1': 'ClaveSegura2025',
+            'password2': 'ClaveSegura2025',
+        })
+        self.assertEqual(respuesta.status_code, 404)
+        self.superusuario.refresh_from_db()
+        self.assertTrue(self.superusuario.check_password('clave12345'))
+
+    def test_admin_de_la_aplicacion_no_elimina_superusuarios(self):
+        self.ingresar(self.admin)
+        respuesta = self.client.post(reverse('usuario_borrar', args=[self.superusuario.pk]))
+        self.assertEqual(respuesta.status_code, 404)
+        self.assertTrue(Usuario.objects.filter(pk=self.superusuario.pk).exists())
+
+    def test_la_lista_oculta_superusuarios_al_admin_de_la_aplicacion(self):
+        self.ingresar(self.admin)
+        respuesta = self.client.get(reverse('usuario_lista'))
+        self.assertNotIn(self.superusuario, list(respuesta.context['usuarios']))
+
+    def test_superusuario_si_gestiona_superusuarios(self):
+        otro = Usuario.objects.create_superuser('super2', password='clave12345')
+        self.ingresar(self.superusuario)
+        respuesta = self.client.get(reverse('usuario_actualizar', args=[otro.pk]))
+        self.assertEqual(respuesta.status_code, 200)
+
+
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
+class PoblarDatosTest(TestCase):
+    @override_settings(DEBUG=False)
+    def test_no_se_ejecuta_sin_debug(self):
+        with self.assertRaises(CommandError):
+            call_command('poblar_datos')
+        self.assertEqual(Usuario.objects.count(), 0)
+
+    @override_settings(DEBUG=True)
+    def test_carga_los_datos_minimos_con_debug(self):
+        call_command('poblar_datos', verbosity=0)
+        self.assertEqual(Usuario.objects.filter(rol='admin').count(), 1)
+        self.assertEqual(Usuario.objects.filter(rol='guia').count(), 2)
+        self.assertEqual(Usuario.objects.filter(rol='turista').count(), 2)
+        for guia in Usuario.objects.filter(rol='guia'):
+            self.assertEqual(guia.experiencias_creadas.count(), 4)
+        for turista in Usuario.objects.filter(rol='turista'):
+            self.assertEqual(turista.inscripciones.count(), 3)
+
+
+class CancelarReservaTest(BaseTest):
+    def setUp(self):
+        super().setUp()
+        self.reserva = Inscripcion.objects.create(usuario=self.turista1, experiencia=self.exp1)
+
+    def test_turista_cancela_su_reserva_pendiente(self):
+        self.ingresar(self.turista1)
+        self.client.post(reverse('cancelar_reserva', args=[self.reserva.pk]))
+        self.assertFalse(Inscripcion.objects.filter(pk=self.reserva.pk).exists())
+
+    def test_no_se_cancela_una_reserva_con_pago_confirmado(self):
+        Inscripcion.objects.filter(pk=self.reserva.pk).update(estado_pago='confirmado')
+        self.ingresar(self.turista1)
+        self.client.post(reverse('cancelar_reserva', args=[self.reserva.pk]))
+        self.assertTrue(Inscripcion.objects.filter(pk=self.reserva.pk).exists())
+
+    def test_turista_no_cancela_reservas_ajenas(self):
+        self.ingresar(self.turista2)
+        respuesta = self.client.post(reverse('cancelar_reserva', args=[self.reserva.pk]))
+        self.assertEqual(respuesta.status_code, 404)
+        self.assertTrue(Inscripcion.objects.filter(pk=self.reserva.pk).exists())
+
+    def test_guia_no_puede_cancelar_reservas(self):
+        self.ingresar(self.guia1)
+        respuesta = self.client.post(reverse('cancelar_reserva', args=[self.reserva.pk]))
+        self.assertEqual(respuesta.status_code, 403)
+        self.assertTrue(Inscripcion.objects.filter(pk=self.reserva.pk).exists())
+
+    def test_cancelar_requiere_post(self):
+        self.ingresar(self.turista1)
+        respuesta = self.client.get(reverse('cancelar_reserva', args=[self.reserva.pk]))
+        self.assertEqual(respuesta.status_code, 405)
+
+    def test_la_cancelacion_libera_el_cupo(self):
+        Experiencia.objects.filter(pk=self.exp1.pk).update(cupo_maximo=1)
+        with self.assertRaises(ReservaError):
+            crear_reserva(self.turista2, self.exp1.pk)
+        self.ingresar(self.turista1)
+        self.client.post(reverse('cancelar_reserva', args=[self.reserva.pk]))
+        crear_reserva(self.turista2, self.exp1.pk)
+        self.assertTrue(Inscripcion.objects.filter(usuario=self.turista2, experiencia=self.exp1).exists())
+
+    def test_el_boton_solo_aparece_en_reservas_pendientes(self):
+        self.ingresar(self.turista1)
+        respuesta = self.client.get(reverse('mis_reservas'))
+        self.assertContains(respuesta, reverse('cancelar_reserva', args=[self.reserva.pk]))
+        Inscripcion.objects.filter(pk=self.reserva.pk).update(estado_pago='confirmado')
+        respuesta = self.client.get(reverse('mis_reservas'))
+        self.assertNotContains(respuesta, reverse('cancelar_reserva', args=[self.reserva.pk]))

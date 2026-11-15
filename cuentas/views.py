@@ -39,8 +39,15 @@ class PerfilView(LoginRequiredMixin, TemplateView):
     template_name = 'cuentas/perfil.html'
 
 
-class UsuarioListView(AdminRequiredMixin, ListView):
-    model = Usuario
+class UsuariosGestionablesMixin:
+    def get_queryset(self):
+        consulta = Usuario.objects.all()
+        if not self.request.user.is_superuser:
+            consulta = consulta.exclude(is_superuser=True)
+        return consulta
+
+
+class UsuarioListView(AdminRequiredMixin, UsuariosGestionablesMixin, ListView):
     template_name = 'cuentas/usuario_lista.html'
     context_object_name = 'usuarios'
 
@@ -54,8 +61,9 @@ class UsuarioCreateView(AdminRequiredMixin, ContextoFormularioMixin, CreateView)
     url_volver = 'usuario_lista'
 
 
-class UsuarioUpdateView(AdminRequiredMixin, ContextoFormularioMixin, UpdateView):
-    model = Usuario
+class UsuarioUpdateView(
+    AdminRequiredMixin, UsuariosGestionablesMixin, ContextoFormularioMixin, UpdateView
+):
     form_class = UsuarioForm
     template_name = 'formulario.html'
     success_url = reverse_lazy('usuario_lista')
@@ -63,8 +71,9 @@ class UsuarioUpdateView(AdminRequiredMixin, ContextoFormularioMixin, UpdateView)
     url_volver = 'usuario_lista'
 
 
-class UsuarioDeleteView(AdminRequiredMixin, ContextoFormularioMixin, DeleteView):
-    model = Usuario
+class UsuarioDeleteView(
+    AdminRequiredMixin, UsuariosGestionablesMixin, ContextoFormularioMixin, DeleteView
+):
     template_name = 'confirmar_borrar.html'
     success_url = reverse_lazy('usuario_lista')
     titulo = 'Eliminar usuario'
@@ -72,4 +81,4 @@ class UsuarioDeleteView(AdminRequiredMixin, ContextoFormularioMixin, DeleteView)
     aviso = 'Se eliminaran tambien sus experiencias y reservas. Esta accion no se puede deshacer.'
 
     def get_queryset(self):
-        return Usuario.objects.exclude(pk=self.request.user.pk)
+        return super().get_queryset().exclude(pk=self.request.user.pk)

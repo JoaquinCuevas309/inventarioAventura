@@ -1,6 +1,7 @@
 from datetime import timedelta
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from cuentas.models import Usuario
@@ -41,6 +42,8 @@ class Command(BaseCommand):
     help = 'Crea usuarios, categorias, experiencias y reservas de prueba'
 
     def handle(self, *args, **options):
+        if not settings.DEBUG:
+            raise CommandError('Este comando crea cuentas de prueba y solo se ejecuta con DEBUG activo.')
         admin, creado = Usuario.objects.get_or_create(
             username='admin_aventura',
             defaults={

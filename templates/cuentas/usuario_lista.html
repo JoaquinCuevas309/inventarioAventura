@@ -33,9 +33,11 @@
                         <td>{{ usuario.get_rol_display }}</td>
                         <td>{% if usuario.is_active %}Activo{% else %}Inactivo{% endif %}</td>
                         <td>
-                            <a href="{% url 'usuario_actualizar' usuario.pk %}" class="btn btn-sm btn-warning">Editar</a>
-                            {% if usuario != user %}
-                                <a href="{% url 'usuario_borrar' usuario.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                            {% if not usuario.is_superuser or user.is_superuser %}
+                                <a href="{% url 'usuario_actualizar' usuario.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                                {% if usuario != user %}
+                                    <a href="{% url 'usuario_borrar' usuario.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>

@@ -7,6 +7,7 @@ urlpatterns = [
     path('catalogo/<int:pk>/', views.ExperienciaDetalleView.as_view(), name='experiencia_detalle'),
     path('reservar/<int:pk>/', views.ReservarView.as_view(), name='reservar'),
     path('mis-reservas/', views.MisReservasView.as_view(), name='mis_reservas'),
+    path('mis-reservas/<int:pk>/cancelar/', views.CancelarReservaView.as_view(), name='cancelar_reserva'),
 
     path('categorias/', views.CategoriaListView.as_view(), name='categoria_lista'),
     path('categorias/nueva/', views.CategoriaCreateView.as_view(), name='categoria_crear'),

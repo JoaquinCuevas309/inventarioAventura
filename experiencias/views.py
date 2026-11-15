@@ -172,6 +172,20 @@ class ReservarView(TuristaRequiredMixin, View):
         return redirect('mis_reservas')
 
 
+class CancelarReservaView(TuristaRequiredMixin, View):
+    def post(self, request, pk):
+        reserva = get_object_or_404(Inscripcion, pk=pk, usuario=request.user)
+        if reserva.estado_pago != 'pendiente':
+            messages.error(
+                request,
+                'Solo se pueden cancelar reservas con pago pendiente. Contacta al administrador.',
+            )
+        else:
+            reserva.delete()
+            messages.success(request, 'Reserva cancelada. El cupo quedo disponible.')
+        return redirect('mis_reservas')
+
+
 class MisReservasView(TuristaRequiredMixin, ListView):
     template_name = 'experiencias/mis_reservas.html'
     context_object_name = 'reservas'

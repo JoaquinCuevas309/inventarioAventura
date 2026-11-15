@@ -22,6 +22,7 @@
                         <th>Precio</th>
                         <th>Reservada el</th>
                         <th>Estado de pago</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,6 +38,16 @@
                                 <span class="badge badge-success">Confirmado</span>
                             {% else %}
                                 <span class="badge badge-warning">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reserva.estado_pago == 'pendiente' %}
+                                <form method="post" action="{% url 'cancelar_reserva' reserva.pk %}" onsubmit="return confirm('Cancelar esta reserva?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted small">Sin acciones</span>
                             {% endif %}
                         </td>
                     </tr>
