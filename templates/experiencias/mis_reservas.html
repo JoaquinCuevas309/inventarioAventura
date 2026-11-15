@@ -1,0 +1,49 @@
+{% extends 'base_panel.html' %}
+
+{% block title %}Mis Reservas{% endblock %}
+
+{% block contenido %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Mis Reservas</h1>
+    <a href="{% url 'catalogo' %}" class="btn btn-success btn-sm shadow-sm">
+        <i class="fas fa-search fa-sm text-white-50"></i> Buscar actividades
+    </a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover datatable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Experiencia</th>
+                        <th>Categoria</th>
+                        <th>Fecha de la actividad</th>
+                        <th>Precio</th>
+                        <th>Reservada el</th>
+                        <th>Estado de pago</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td><a href="{% url 'experiencia_detalle' reserva.experiencia.pk %}">{{ reserva.experiencia.titulo }}</a></td>
+                        <td>{{ reserva.experiencia.categoria.nombre }}</td>
+                        <td>{{ reserva.experiencia.fecha_hora|date:"d/m/Y H:i" }}</td>
+                        <td>${{ reserva.experiencia.precio }}</td>
+                        <td>{{ reserva.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if reserva.estado_pago == 'confirmado' %}
+                                <span class="badge badge-success">Confirmado</span>
+                            {% else %}
+                                <span class="badge badge-warning">Pendiente</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

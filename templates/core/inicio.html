@@ -1,0 +1,76 @@
+{% extends 'base_publico.html' %}
+
+{% block title %}Aventuras del Sur - Ecoparque y Reserva Natural{% endblock %}
+
+{% block contenido %}
+<section class="bg-success text-white py-5">
+    <div class="container py-4 text-center">
+        <h1 class="display-4 fw-bold">Ecoparque y Reserva Natural Aventuras del Sur</h1>
+        <p class="lead mt-3 mb-4">Trekking, canopy, kayak y arriendo de equipos en medio de la naturaleza del sur de Chile.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{% url 'login' %}" class="btn btn-light btn-lg">Ingresar</a>
+            <a href="{% url 'catalogo' %}" class="btn btn-outline-light btn-lg">Ver actividades</a>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <h3 class="h5 text-success fw-bold">Quienes somos</h3>
+            <p class="text-muted">Somos un ecoparque dedicado a la conservacion del bosque nativo y a la educacion ambiental a traves de experiencias al aire libre.</p>
+        </div>
+        <div class="col-md-4">
+            <h3 class="h5 text-success fw-bold">Nuestra mision</h3>
+            <p class="text-muted">Acercar a las familias y a los visitantes a la naturaleza de forma segura, guiada y respetuosa con el entorno.</p>
+        </div>
+        <div class="col-md-4">
+            <h3 class="h5 text-success fw-bold">Reserva en linea</h3>
+            <p class="text-muted">Registrate como turista, elige tu actividad y reserva tu cupo. Revisa tu historial y el estado de tu pago desde tu panel.</p>
+        </div>
+    </div>
+</section>
+
+<section class="bg-white py-5 border-top border-bottom">
+    <div class="container">
+        <h2 class="text-center text-success fw-bold mb-4">Nuestras categorias</h2>
+        <div class="row g-4">
+            {% for categoria in categorias %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-success shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">{{ categoria.nombre }}</h5>
+                            <p class="card-text text-muted">{{ categoria.descripcion }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted">Aun no hay categorias disponibles.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <h2 class="text-center text-success fw-bold mb-4">Experiencias destacadas</h2>
+    <div class="row g-4">
+        {% for experiencia in destacadas %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-success mb-2">{{ experiencia.categoria.nombre }}</span>
+                        <h5 class="card-title">{{ experiencia.titulo }}</h5>
+                        <p class="card-text text-muted">{{ experiencia.descripcion|truncatechars:90 }}</p>
+                        <p class="fw-bold mb-0">${{ experiencia.precio }} por persona</p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'experiencia_detalle' experiencia.pk %}" class="btn btn-outline-success w-100">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center text-muted">Pronto publicaremos nuevas experiencias.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

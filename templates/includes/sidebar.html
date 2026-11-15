@@ -1,0 +1,87 @@
+{% with actual=request.resolver_match.url_name %}
+<ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'inicio' %}">
+        <div class="sidebar-brand-icon">
+            <i class="fas fa-mountain"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Aventuras del Sur</div>
+    </a>
+
+    <hr class="sidebar-divider my-0">
+
+    <li class="nav-item {% if actual == 'panel' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'panel' %}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Panel de Control</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        {{ user.get_rol_display }}
+    </div>
+
+    {% if user.rol == 'admin' %}
+        <li class="nav-item {% if 'usuario' in actual %}active{% endif %}">
+            <a class="nav-link" href="{% url 'usuario_lista' %}">
+                <i class="fas fa-fw fa-users"></i>
+                <span>Usuarios</span>
+            </a>
+        </li>
+        <li class="nav-item {% if 'categoria' in actual %}active{% endif %}">
+            <a class="nav-link" href="{% url 'categoria_lista' %}">
+                <i class="fas fa-fw fa-tags"></i>
+                <span>Categorias</span>
+            </a>
+        </li>
+        <li class="nav-item {% if 'experiencia' in actual and actual != 'experiencia_detalle' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'experiencia_lista' %}">
+                <i class="fas fa-fw fa-hiking"></i>
+                <span>Experiencias</span>
+            </a>
+        </li>
+        <li class="nav-item {% if 'inscripcion' in actual %}active{% endif %}">
+            <a class="nav-link" href="{% url 'inscripcion_lista' %}">
+                <i class="fas fa-fw fa-ticket-alt"></i>
+                <span>Reservas</span>
+            </a>
+        </li>
+    {% elif user.rol == 'guia' %}
+        <li class="nav-item {% if 'experiencia' in actual and actual != 'experiencia_detalle' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'experiencia_lista' %}">
+                <i class="fas fa-fw fa-hiking"></i>
+                <span>Mis Experiencias</span>
+            </a>
+        </li>
+        <li class="nav-item {% if 'inscripcion' in actual %}active{% endif %}">
+            <a class="nav-link" href="{% url 'inscripcion_lista' %}">
+                <i class="fas fa-fw fa-ticket-alt"></i>
+                <span>Reservas de mis Grupos</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item {% if actual == 'mis_reservas' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'mis_reservas' %}">
+                <i class="fas fa-fw fa-ticket-alt"></i>
+                <span>Mis Reservas</span>
+            </a>
+        </li>
+    {% endif %}
+
+    <hr class="sidebar-divider">
+
+    <li class="nav-item {% if actual == 'catalogo' or actual == 'experiencia_detalle' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'catalogo' %}">
+            <i class="fas fa-fw fa-list"></i>
+            <span>Catalogo de Actividades</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+</ul>
+{% endwith %}

@@ -1,0 +1,42 @@
+{% extends 'base_publico.html' %}
+
+{% block title %}Actividades - Aventuras del Sur{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="text-success fw-bold mb-4">Actividades disponibles</h1>
+
+    {% if ultimas_vistas %}
+        <div class="alert alert-light border">
+            <strong>Vistas recientemente:</strong>
+            {% for vista in ultimas_vistas %}
+                <a href="{% url 'experiencia_detalle' vista.pk %}">{{ vista.titulo }}</a>{% if not forloop.last %} | {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        {% for experiencia in experiencias %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-success mb-2">{{ experiencia.categoria.nombre }}</span>
+                        <h5 class="card-title">{{ experiencia.titulo }}</h5>
+                        <p class="card-text text-muted">{{ experiencia.descripcion|truncatechars:100 }}</p>
+                        <ul class="list-unstyled small mb-0">
+                            <li><strong>Fecha:</strong> {{ experiencia.fecha_hora|date:"d/m/Y H:i" }}</li>
+                            <li><strong>Precio:</strong> ${{ experiencia.precio }}</li>
+                            <li><strong>Cupos disponibles:</strong> {{ experiencia.cupos_disponibles }}</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'experiencia_detalle' experiencia.pk %}" class="btn btn-success w-100">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">No hay actividades disponibles por el momento.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

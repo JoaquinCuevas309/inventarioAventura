@@ -1,0 +1,42 @@
+{% extends 'base_panel.html' %}
+
+{% block title %}Categorias{% endblock %}
+
+{% block contenido %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Gestion de Categorias</h1>
+    <a href="{% url 'categoria_crear' %}" class="btn btn-success btn-sm shadow-sm">
+        <i class="fas fa-plus fa-sm text-white-50"></i> Nueva categoria
+    </a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover datatable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripcion</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for categoria in categorias %}
+                    <tr>
+                        <td>{{ categoria.nombre }}</td>
+                        <td>{{ categoria.descripcion }}</td>
+                        <td>{% if categoria.activo %}Activo{% else %}Inactivo{% endif %}</td>
+                        <td>
+                            <a href="{% url 'categoria_actualizar' categoria.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                            <a href="{% url 'categoria_borrar' categoria.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

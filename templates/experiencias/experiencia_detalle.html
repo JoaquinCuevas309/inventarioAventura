@@ -1,0 +1,44 @@
+{% extends 'base_publico.html' %}
+
+{% block title %}{{ experiencia.titulo }}{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary btn-sm mb-3">Volver al catalogo</a>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <span class="badge bg-success mb-2">{{ experiencia.categoria.nombre }}</span>
+            <h1 class="h3 text-success fw-bold">{{ experiencia.titulo }}</h1>
+            <p class="mt-3">{{ experiencia.descripcion }}</p>
+            <ul class="list-unstyled">
+                <li><strong>Fecha y hora:</strong> {{ experiencia.fecha_hora|date:"d/m/Y H:i" }}</li>
+                <li><strong>Precio por persona:</strong> ${{ experiencia.precio }}</li>
+                <li><strong>Cupo maximo:</strong> {{ experiencia.cupo_maximo }}</li>
+                <li><strong>Cupos disponibles:</strong> {{ experiencia.cupos_disponibles }}</li>
+                <li><strong>Guia responsable:</strong> {{ experiencia.creador.first_name }} {{ experiencia.creador.last_name }}</li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                {% if user.rol == 'turista' %}
+                    {% if ya_reservada %}
+                        <div class="alert alert-info mb-0">Ya tienes una reserva para esta actividad. Revisa su estado en <a href="{% url 'mis_reservas' %}">Mis Reservas</a>.</div>
+                    {% elif experiencia.ya_realizada %}
+                        <div class="alert alert-secondary mb-0">Esta actividad ya se realizo y no admite reservas.</div>
+                    {% elif experiencia.cupos_disponibles == 0 %}
+                        <div class="alert alert-danger mb-0">No quedan cupos disponibles.</div>
+                    {% else %}
+                        <form method="post" action="{% url 'reservar' experiencia.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-lg">Reservar mi cupo</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-secondary mb-0">Las reservas las realizan los turistas desde su cuenta.</div>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-success btn-lg">Ingresa para reservar</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

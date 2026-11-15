@@ -1,0 +1,52 @@
+{% extends 'base_panel.html' %}
+
+{% block title %}Experiencias{% endblock %}
+
+{% block contenido %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% if user.rol == 'admin' %}Gestion de Experiencias{% else %}Mis Experiencias{% endif %}</h1>
+    <a href="{% url 'experiencia_crear' %}" class="btn btn-success btn-sm shadow-sm">
+        <i class="fas fa-plus fa-sm text-white-50"></i> Nueva experiencia
+    </a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover datatable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Titulo</th>
+                        <th>Categoria</th>
+                        <th>Fecha y hora</th>
+                        <th>Precio</th>
+                        <th>Cupos</th>
+                        <th>Estado</th>
+                        {% if user.rol == 'admin' %}<th>Creador</th>{% endif %}
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for experiencia in experiencias %}
+                    <tr>
+                        <td>{{ experiencia.titulo }}</td>
+                        <td>{{ experiencia.categoria.nombre }}</td>
+                        <td>{{ experiencia.fecha_hora|date:"d/m/Y H:i" }}</td>
+                        <td>${{ experiencia.precio }}</td>
+                        <td>{{ experiencia.cupos_ocupados }} / {{ experiencia.cupo_maximo }}</td>
+                        <td>{% if experiencia.activa %}Activa{% else %}Inactiva{% endif %}</td>
+                        {% if user.rol == 'admin' %}<td>{{ experiencia.creador.username }}</td>{% endif %}
+                        <td>
+                            <a href="{% url 'experiencia_actualizar' experiencia.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                            {% if user.rol == 'admin' %}
+                                <a href="{% url 'experiencia_borrar' experiencia.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

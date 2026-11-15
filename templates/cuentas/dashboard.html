@@ -1,0 +1,134 @@
+{% extends 'base_panel.html' %}
+
+{% block title %}Panel de Control{% endblock %}
+
+{% block contenido %}
+<h1 class="h3 mb-4 text-gray-800">Bienvenido, {{ user.first_name|default:user.username }}</h1>
+
+<div class="row">
+    {% if user.rol == 'admin' %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'usuario_lista' %}" class="text-decoration-none">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Usuarios</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_usuarios }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-users fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'categoria_lista' %}" class="text-decoration-none">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Categorias</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_categorias }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-tags fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'experiencia_lista' %}" class="text-decoration-none">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Experiencias</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_experiencias }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-hiking fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'inscripcion_lista' %}" class="text-decoration-none">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Reservas</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_reservas }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-ticket-alt fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% elif user.rol == 'guia' %}
+        <div class="col-xl-6 col-md-6 mb-4">
+            <a href="{% url 'experiencia_lista' %}" class="text-decoration-none">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Mis experiencias</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_experiencias }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-hiking fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-6 col-md-6 mb-4">
+            <a href="{% url 'inscripcion_lista' %}" class="text-decoration-none">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Reservas en mis grupos</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_reservas }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-ticket-alt fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% else %}
+        <div class="col-xl-6 col-md-6 mb-4">
+            <a href="{% url 'mis_reservas' %}" class="text-decoration-none">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Mis reservas</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_reservas }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-ticket-alt fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-6 col-md-6 mb-4">
+            <a href="{% url 'catalogo' %}" class="text-decoration-none">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Actividades disponibles</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_disponibles }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-hiking fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

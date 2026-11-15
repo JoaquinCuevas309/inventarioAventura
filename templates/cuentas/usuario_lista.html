@@ -1,0 +1,48 @@
+{% extends 'base_panel.html' %}
+
+{% block title %}Usuarios{% endblock %}
+
+{% block contenido %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Gestion de Usuarios</h1>
+    <a href="{% url 'usuario_crear' %}" class="btn btn-success btn-sm shadow-sm">
+        <i class="fas fa-plus fa-sm text-white-50"></i> Nuevo usuario
+    </a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover datatable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre completo</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.username }}</td>
+                        <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.get_rol_display }}</td>
+                        <td>{% if usuario.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+                        <td>
+                            <a href="{% url 'usuario_actualizar' usuario.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                            {% if usuario != user %}
+                                <a href="{% url 'usuario_borrar' usuario.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
