@@ -68,13 +68,13 @@
             </a>
         </div>
     {% elif user.rol == 'guia' %}
-        <div class="col-xl-6 col-md-6 mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
             <a href="{% url 'experiencia_lista' %}" class="text-decoration-none">
                 <div class="card border-left-success shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Mis experiencias</div>
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Mis tours</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_experiencias }}</div>
                             </div>
                             <div class="col-auto"><i class="fas fa-hiking fa-2x text-gray-300"></i></div>
@@ -83,7 +83,7 @@
                 </div>
             </a>
         </div>
-        <div class="col-xl-6 col-md-6 mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
             <a href="{% url 'inscripcion_lista' %}" class="text-decoration-none">
                 <div class="card border-left-warning shadow h-100 py-2">
                     <div class="card-body">
@@ -97,6 +97,42 @@
                     </div>
                 </div>
             </a>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'calendario' %}" class="text-decoration-none">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Rutas en curso</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="rutasEnCurso">{{ rutas_en_curso }}</div>
+                            </div>
+                            <div class="col-auto"><i class="fas fa-calendar-alt fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Proximas rutas</h6>
+                </div>
+                <div class="card-body">
+                    {% if proximas %}
+                        <div class="list-group" id="proximasRutas">
+                            {% for ruta in proximas %}
+                                <a href="{% url 'grupo_detalle' ruta.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <span>{{ ruta.fecha_hora|date:"d/m/Y H:i" }} &middot; {{ ruta.titulo }}</span>
+                                    {% include 'includes/estado_ruta.html' with ruta=ruta %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No tienes rutas proximas.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     {% else %}
         <div class="col-xl-6 col-md-6 mb-4">

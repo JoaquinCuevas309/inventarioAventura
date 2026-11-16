@@ -22,6 +22,7 @@
                         <th>Experiencia</th>
                         <th>Fecha de inscripcion</th>
                         <th>Estado de pago</th>
+                        <th>Asistencia</th>
                         {% if user.rol == 'admin' %}<th>Acciones</th>{% endif %}
                     </tr>
                 </thead>
@@ -32,8 +33,15 @@
                         <td>{{ inscripcion.experiencia.titulo }}</td>
                         <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
                         <td>{{ inscripcion.get_estado_pago_display }}</td>
+                        <td>{% if inscripcion.asistio %}Presente{% elif inscripcion.experiencia.admite_registro_de_visitantes %}Ausente{% else %}Pendiente{% endif %}</td>
                         {% if user.rol == 'admin' %}
                         <td>
+                            {% if inscripcion.estado_pago == 'pendiente' %}
+                                <form method="post" action="{% url 'confirmar_pago' inscripcion.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">Confirmar pago</button>
+                                </form>
+                            {% endif %}
                             <a href="{% url 'inscripcion_actualizar' inscripcion.pk %}" class="btn btn-sm btn-warning">Editar</a>
                             <a href="{% url 'inscripcion_borrar' inscripcion.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
                         </td>

@@ -42,10 +42,12 @@
                         </td>
                         <td>
                             {% if reserva.estado_pago == 'pendiente' %}
-                                <form method="post" action="{% url 'cancelar_reserva' reserva.pk %}" onsubmit="return confirm('Cancelar esta reserva?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-danger btn-cancelar-reserva"
+                                        data-url="{% url 'cancelar_reserva' reserva.pk %}"
+                                        data-titulo="{{ reserva.experiencia.titulo }}"
+                                        data-fecha="{{ reserva.experiencia.fecha_hora|date:'d/m/Y H:i' }}">
+                                    Cancelar
+                                </button>
                             {% else %}
                                 <span class="text-muted small">Sin acciones</span>
                             {% endif %}
@@ -57,4 +59,81 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalCancelarPaso1" tabindex="-1" role="dialog" aria-labelledby="tituloPaso1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloPaso1">Cancelar reserva</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">Vas a cancelar tu reserva para:</p>
+                <p class="h6 font-weight-bold text-gray-800 mb-1" id="cancelarTitulo"></p>
+                <p class="small text-muted mb-0">Fecha de la actividad: <span id="cancelarFecha"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Volver</button>
+                <button type="button" class="btn btn-warning" id="continuarCancelacion">Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCancelarPaso2" tabindex="-1" role="dialog" aria-labelledby="tituloPaso2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-left-danger">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="tituloPaso2">Confirmacion final</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" id="formCancelarReserva" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-danger mb-3">
+                        Esta accion elimina tu reserva de <strong id="cancelarTituloFinal"></strong> y libera tu cupo para otros turistas.
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="entiendoCancelar">
+                        <label class="custom-control-label" for="entiendoCancelar">Entiendo que perdere mi cupo y que esta accion no se puede deshacer.</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No cancelar</button>
+                    <button type="submit" class="btn btn-danger" id="confirmarCancelacion" disabled>Cancelar reserva definitivamente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).on('click', '.btn-cancelar-reserva', function () {
+        var boton = $(this);
+        $('#cancelarTitulo').text(boton.data('titulo'));
+        $('#cancelarTituloFinal').text(boton.data('titulo'));
+        $('#cancelarFecha').text(boton.data('fecha'));
+        $('#formCancelarReserva').attr('action', boton.data('url'));
+        $('#modalCancelarPaso1').modal('show');
+    });
+
+    $('#continuarCancelacion').on('click', function () {
+        encadenarModales('#modalCancelarPaso1', '#modalCancelarPaso2');
+    });
+
+    $('#modalCancelarPaso2').on('show.bs.modal', function () {
+        $('#entiendoCancelar').prop('checked', false);
+        $('#confirmarCancelacion').prop('disabled', true);
+    });
+
+    $('#entiendoCancelar').on('change', function () {
+        $('#confirmarCancelacion').prop('disabled', !this.checked);
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base_panel.html' %}
+
+{% block title %}Calendario de actividades{% endblock %}
+
+{% block contenido %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Calendario de actividades</h1>
+    <a href="{% url 'experiencia_lista' %}" class="btn btn-success btn-sm shadow-sm">
+        <i class="fas fa-hiking fa-sm text-white-50"></i> Mis tours
+    </a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex align-items-center justify-content-between">
+        <a href="{% url 'calendario' %}?mes={{ mes_anterior }}" class="btn btn-sm btn-outline-secondary" id="mesAnterior">
+            <i class="fas fa-chevron-left"></i> Anterior
+        </a>
+        <h6 class="m-0 font-weight-bold text-success">{{ titulo_mes }} ({{ total_del_mes }} ruta{{ total_del_mes|pluralize }})</h6>
+        <a href="{% url 'calendario' %}?mes={{ mes_siguiente }}" class="btn btn-sm btn-outline-secondary" id="mesSiguiente">
+            Siguiente <i class="fas fa-chevron-right"></i>
+        </a>
+    </div>
+    <div class="card-body p-2">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0" id="tablaCalendario">
+                <thead class="thead-light">
+                    <tr>
+                        {% for dia in dias_semana %}
+                            <th class="text-center">{{ dia }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for semana in semanas %}
+                        <tr>
+                            {% for celda in semana %}
+                                <td class="align-top {% if not celda.en_mes %}bg-light text-gray-500{% endif %} {% if celda.es_hoy %}border-success{% endif %}" style="height: 110px; min-width: 120px;" data-fecha="{{ celda.fecha|date:'Y-m-d' }}">
+                                    <div class="small font-weight-bold {% if celda.es_hoy %}text-success{% endif %}">{{ celda.fecha.day }}</div>
+                                    {% for ruta in celda.rutas %}
+                                        <a href="{% url 'grupo_detalle' ruta.pk %}" class="d-block small mb-1 text-decoration-none">
+                                            {{ ruta.fecha_hora|date:"H:i" }} {{ ruta.titulo|truncatechars:22 }}
+                                            {% include 'includes/estado_ruta.html' %}
+                                        </a>
+                                    {% endfor %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

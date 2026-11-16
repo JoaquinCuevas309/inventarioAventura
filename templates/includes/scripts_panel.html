@@ -1,0 +1,35 @@
+{% load static %}
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('.datatable').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+            }
+        });
+    });
+
+    function encadenarModales(primero, segundo) {
+        var $primero = $(primero);
+        var intentos = 0;
+        $primero.one('hidden.bs.modal', function () {
+            $(segundo).modal('show');
+        });
+        (function cerrar() {
+            $primero.modal('hide');
+            intentos += 1;
+            if (intentos < 20) {
+                setTimeout(function () {
+                    if ($primero.hasClass('show')) {
+                        cerrar();
+                    }
+                }, 100);
+            }
+        })();
+    }
+</script>

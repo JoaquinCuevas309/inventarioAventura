@@ -37,6 +37,13 @@ EXPERIENCIAS = [
     ('Trekking Nocturno de Fauna', 'Trekking', 8, 16000),
 ]
 
+REALIZADAS = [
+    ('guia_marcela', 'Trekking Amanecer en el Volcan', 'Trekking', 10, 15000, 'en_curso', timedelta(hours=-2)),
+    ('guia_marcela', 'Canopy Circuito Clasico del Mes Pasado', 'Canopy', 8, 24000, 'finalizada', timedelta(days=-10)),
+    ('guia_tomas', 'Kayak Rio Calle Calle Matutino', 'Kayak', 10, 21000, 'en_curso', timedelta(hours=-3)),
+    ('guia_tomas', 'Trekking Laguna Verde del Mes Pasado', 'Trekking', 12, 13000, 'finalizada', timedelta(days=-12)),
+]
+
 
 class Command(BaseCommand):
     help = 'Crea usuarios, categorias, experiencias y reservas de prueba'
@@ -113,7 +120,7 @@ class Command(BaseCommand):
                     'creador': guias[0 if indice < 4 else 1],
                 },
             )
-            if not creada and experiencia.fecha_hora <= ahora:
+            if not creada and experiencia.estado == 'programada' and experiencia.fecha_hora <= ahora:
                 experiencia.fecha_hora = fecha
                 experiencia.save(update_fields=['fecha_hora'])
             experiencias.append(experiencia)
@@ -125,6 +132,31 @@ class Command(BaseCommand):
                     usuario=turista,
                     experiencia=experiencia,
                     defaults={'estado_pago': 'confirmado' if desplazamiento == 0 else 'pendiente'},
+                )
+
+        guias_por_usuario = {guia.username: guia for guia in guias}
+        for username, titulo, categoria, cupo, precio, estado, desfase in REALIZADAS:
+            experiencia, _ = Experiencia.objects.get_or_create(
+                titulo=titulo,
+                defaults={
+                    'descripcion': f'{titulo}. Actividad guiada con equipo de seguridad incluido.',
+                    'precio': precio,
+                    'cupo_maximo': cupo,
+                    'fecha_hora': ahora + desfase,
+                    'categoria': categorias[categoria],
+                    'creador': guias_por_usuario[username],
+                    'estado': estado,
+                },
+            )
+            for numero, turista in enumerate(turistas):
+                finalizada = estado == 'finalizada'
+                Inscripcion.objects.get_or_create(
+                    usuario=turista,
+                    experiencia=experiencia,
+                    defaults={
+                        'estado_pago': 'confirmado' if finalizada or numero == 0 else 'pendiente',
+                        'asistio': finalizada and numero == 0,
+                    },
                 )
 
         self.stdout.write(self.style.SUCCESS('Datos de prueba creados correctamente.'))

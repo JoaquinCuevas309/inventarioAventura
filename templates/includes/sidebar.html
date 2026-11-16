@@ -48,10 +48,16 @@
             </a>
         </li>
     {% elif user.rol == 'guia' %}
-        <li class="nav-item {% if 'experiencia' in actual and actual != 'experiencia_detalle' %}active{% endif %}">
+        <li class="nav-item {% if actual == 'calendario' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'calendario' %}">
+                <i class="fas fa-fw fa-calendar-alt"></i>
+                <span>Calendario</span>
+            </a>
+        </li>
+        <li class="nav-item {% if 'experiencia' in actual and actual != 'experiencia_detalle' or actual == 'grupo_detalle' or actual == 'registrar_visitantes' %}active{% endif %}">
             <a class="nav-link" href="{% url 'experiencia_lista' %}">
                 <i class="fas fa-fw fa-hiking"></i>
-                <span>Mis Experiencias</span>
+                <span>Mis Tours</span>
             </a>
         </li>
         <li class="nav-item {% if 'inscripcion' in actual %}active{% endif %}">

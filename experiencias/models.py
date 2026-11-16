@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Count
@@ -24,21 +26,33 @@ class ExperienciaQuerySet(models.QuerySet):
 
     def disponibles(self):
         return self.filter(
-            activa=True, categoria__activo=True, fecha_hora__gt=timezone.now()
+            activa=True,
+            categoria__activo=True,
+            estado='programada',
+            fecha_hora__gt=timezone.now(),
         )
 
 
 class Experiencia(models.Model):
+    ESTADOS_CHOICES = (
+        ('programada', 'Programada'),
+        ('en_curso', 'En curso'),
+        ('finalizada', 'Finalizada'),
+        ('suspendida', 'Suspendida'),
+    )
+    HORAS_PREVIAS_PARA_INICIAR = 1
+
     titulo = models.CharField(max_length=150)
     descripcion = models.TextField()
     precio = models.PositiveIntegerField()
     cupo_maximo = models.PositiveIntegerField()
     fecha_hora = models.DateTimeField()
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='experiencias')
+    categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, related_name='experiencias')
     creador = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='experiencias_creadas'
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='experiencias_creadas'
     )
     activa = models.BooleanField(default=True)
+    estado = models.CharField(max_length=15, choices=ESTADOS_CHOICES, default='programada')
 
     objects = ExperienciaQuerySet.as_manager()
 
@@ -61,6 +75,27 @@ class Experiencia(models.Model):
     def ya_realizada(self):
         return self.fecha_hora <= timezone.now()
 
+    @property
+    def puede_iniciarse(self):
+        anticipacion = timedelta(hours=self.HORAS_PREVIAS_PARA_INICIAR)
+        return self.fecha_hora - anticipacion <= timezone.now()
+
+    @property
+    def estados_siguientes(self):
+        if self.estado == 'programada':
+            siguientes = ['en_curso', 'suspendida', 'finalizada'] if self.puede_iniciarse else ['suspendida']
+        elif self.estado == 'en_curso':
+            siguientes = ['finalizada', 'suspendida']
+        elif self.estado == 'suspendida':
+            siguientes = ['programada']
+        else:
+            siguientes = []
+        return [(valor, etiqueta) for valor, etiqueta in self.ESTADOS_CHOICES if valor in siguientes]
+
+    @property
+    def admite_registro_de_visitantes(self):
+        return self.estado in ('en_curso', 'finalizada')
+
     def __str__(self):
         return self.titulo
 
@@ -72,11 +107,12 @@ class Inscripcion(models.Model):
     )
 
     usuario = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='inscripciones'
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='inscripciones'
     )
-    experiencia = models.ForeignKey(Experiencia, on_delete=models.CASCADE, related_name='inscripciones')
+    experiencia = models.ForeignKey(Experiencia, on_delete=models.PROTECT, related_name='inscripciones')
     fecha_inscripcion = models.DateTimeField(auto_now_add=True)
     estado_pago = models.CharField(max_length=20, choices=ESTADOS_PAGO_CHOICES, default='pendiente')
+    asistio = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-fecha_inscripcion']

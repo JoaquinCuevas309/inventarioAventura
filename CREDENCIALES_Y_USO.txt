@@ -1,51 +1,6 @@
-PROYECTO: Ecoparque y Reserva Natural Aventuras del Sur (inventarioAventura)
-
-INSTALACION
-1. Crear base de datos MySQL vacia llamada inventarioaventura.
-2. Variables de entorno opcionales: DB_NOMBRE, DB_USUARIO, DB_CLAVE, DB_HOST, DB_PUERTO.
-3. pip install -r requirements.txt
-4. python manage.py migrate
-5. python manage.py poblar_datos
-6. python manage.py runserver
-
-Para probar sin MySQL: definir USAR_SQLITE=1 antes de ejecutar los comandos.
-
-PRUEBAS AUTOMATICAS
-python manage.py test
-Las pruebas cubren permisos por rol, cupos, fechas, categorias inactivas, validacion de contraseñas y consultas del catalogo.
-
-FECHAS DE LOS DATOS DE PRUEBA
-Las experiencias de prueba quedan programadas unos 90 dias despues de cargar los datos. Las reservas solo se aceptan para experiencias futuras.
-Si pasa ese plazo, ejecutar nuevamente python manage.py poblar_datos para reprogramar las experiencias vencidas.
-
-RESPALDO DE LA BASE DE DATOS (MySQL)
-Archivo: respaldo_inventarioaventura.sql (estructura completa y datos poblados).
-Importar con MySQL Workbench (File > Run SQL Script) o desde consola:
-mysql -u USUARIO -p < respaldo_inventarioaventura.sql
-El script crea la base inventarioaventura y no requiere ejecutar migrate despues.
-Para generar un respaldo nuevo desde MySQL:
-mysqldump -u USUARIO -p inventarioaventura > respaldo_inventarioaventura.sql
-
 CREDENCIALES DE PRUEBA (clave para todos: Aventura2025!)
 Administrador : admin_aventura
 Guia          : guia_marcela
 Guia          : guia_tomas
 Turista       : turista_ana
 Turista       : turista_luis
-
-DATOS MINIMOS CARGADOS POR poblar_datos
-- 1 administrador, 2 guias, 2 turistas.
-- 4 categorias y 8 experiencias (4 por cada guia).
-- 3 reservas por cada turista.
-
-RUTAS PRINCIPALES
-/                      Pagina principal publica
-/catalogo/             Catalogo publico de experiencias activas
-/accounts/login/       Ingreso
-/registro/             Registro de turistas
-/panel/                Panel privado segun rol
-/usuarios/             Gestion de usuarios (administrador)
-/categorias/           Gestion de categorias (administrador)
-/experiencias/         Gestion de experiencias (administrador y guia)
-/reservas/             Gestion de reservas (administrador) y reservas de sus grupos (guia)
-/mis-reservas/         Historial de reservas y cancelacion de reservas con pago pendiente (turista)

@@ -524,9 +524,27 @@ class PoblarDatosTest(TestCase):
         self.assertEqual(Usuario.objects.filter(rol='guia').count(), 2)
         self.assertEqual(Usuario.objects.filter(rol='turista').count(), 2)
         for guia in Usuario.objects.filter(rol='guia'):
-            self.assertEqual(guia.experiencias_creadas.count(), 4)
+            self.assertGreaterEqual(guia.experiencias_creadas.count(), 4)
         for turista in Usuario.objects.filter(rol='turista'):
-            self.assertEqual(turista.inscripciones.count(), 3)
+            self.assertGreaterEqual(turista.inscripciones.count(), 3)
+
+    @override_settings(DEBUG=True)
+    def test_los_datos_incluyen_rutas_en_curso_y_finalizadas_con_asistencia(self):
+        call_command('poblar_datos', verbosity=0)
+        for guia in Usuario.objects.filter(rol='guia'):
+            estados = set(guia.experiencias_creadas.values_list('estado', flat=True))
+            self.assertTrue({'programada', 'en_curso', 'finalizada'} <= estados)
+        self.assertTrue(Inscripcion.objects.filter(experiencia__estado='finalizada', asistio=True).exists())
+        self.assertTrue(Inscripcion.objects.filter(experiencia__estado='finalizada', asistio=False).exists())
+
+    @override_settings(DEBUG=True)
+    def test_cargar_los_datos_dos_veces_no_reprograma_las_rutas_realizadas(self):
+        call_command('poblar_datos', verbosity=0)
+        antes = list(Experiencia.objects.filter(estado__in=['en_curso', 'finalizada']).values_list('pk', 'fecha_hora'))
+        call_command('poblar_datos', verbosity=0)
+        despues = list(Experiencia.objects.filter(estado__in=['en_curso', 'finalizada']).values_list('pk', 'fecha_hora'))
+        self.assertEqual(sorted(antes), sorted(despues))
+        self.assertEqual(Inscripcion.objects.count(), len(set(Inscripcion.objects.values_list('usuario_id', 'experiencia_id'))))
 
 
 class CancelarReservaTest(BaseTest):
@@ -578,3 +596,30 @@ class CancelarReservaTest(BaseTest):
         Inscripcion.objects.filter(pk=self.reserva.pk).update(estado_pago='confirmado')
         respuesta = self.client.get(reverse('mis_reservas'))
         self.assertNotContains(respuesta, reverse('cancelar_reserva', args=[self.reserva.pk]))
+
+    def test_la_cancelacion_usa_dos_modales_y_no_el_confirm_del_navegador(self):
+        self.ingresar(self.turista1)
+        respuesta = self.client.get(reverse('mis_reservas'))
+        self.assertContains(respuesta, 'id="modalCancelarPaso1"')
+        self.assertContains(respuesta, 'id="modalCancelarPaso2"')
+        self.assertContains(respuesta, 'id="entiendoCancelar"')
+        self.assertContains(respuesta, 'id="confirmarCancelacion" disabled')
+        self.assertContains(respuesta, 'data-titulo="Ruta uno"')
+        self.assertNotContains(respuesta, 'confirm(')
+
+
+class CasillasDeFormularioTest(BaseTest):
+    def test_las_casillas_usan_el_formato_de_sb_admin_2(self):
+        self.ingresar(self.admin)
+        rutas = [
+            reverse('categoria_actualizar', args=[self.categoria.pk]),
+            reverse('experiencia_actualizar', args=[self.exp1.pk]),
+            reverse('usuario_actualizar', args=[self.turista1.pk]),
+        ]
+        for ruta in rutas:
+            with self.subTest(ruta=ruta):
+                respuesta = self.client.get(ruta)
+                self.assertContains(respuesta, 'custom-control custom-checkbox')
+                self.assertContains(respuesta, 'custom-control-input')
+                self.assertContains(respuesta, 'custom-control-label')
+                self.assertNotContains(respuesta, 'form-check-input')

@@ -12,13 +12,124 @@
                 <h6 class="m-0 font-weight-bold text-success">Datos de la cuenta</h6>
             </div>
             <div class="card-body">
-                <p><strong>Usuario:</strong> {{ user.username }}</p>
-                <p><strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}</p>
-                <p><strong>Correo:</strong> {{ user.email }}</p>
-                <p><strong>Telefono:</strong> {{ user.telefono|default:"Sin registrar" }}</p>
-                <p class="mb-0"><strong>Rol:</strong> {{ user.get_rol_display }}</p>
+                <p><strong>Usuario:</strong> {{ object.username }}</p>
+                <p><strong>Rol:</strong> {{ object.get_rol_display }}</p>
+                <hr>
+                <form method="post" id="formPerfil">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-left-danger shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-danger">Zona de riesgo</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Eliminar tu cuenta es permanente y no se puede deshacer.</p>
+                {% if motivo_bloqueo %}
+                    <div class="alert alert-secondary">{{ motivo_bloqueo }}</div>
+                    <button type="button" class="btn btn-danger" disabled>Eliminar mi cuenta</button>
+                {% else %}
+                    <button type="button" class="btn btn-danger" id="abrirEliminarCuenta">Eliminar mi cuenta</button>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+{% if not motivo_bloqueo %}
+<div class="modal fade" id="modalEliminarPaso1" tabindex="-1" role="dialog" aria-labelledby="tituloEliminar1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloEliminar1">Eliminar cuenta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Estas por eliminar la cuenta <strong>{{ user.username }}</strong>. Al hacerlo:</p>
+                <ul class="mb-0">
+                    <li>Se cerrara tu sesion y no podras volver a ingresar con estos datos.</li>
+                    {% if total_reservas %}
+                        <li>Se eliminaran tus {{ total_reservas }} reserva{{ total_reservas|pluralize }} y se liberaran sus cupos.</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Volver</button>
+                <button type="button" class="btn btn-warning" id="continuarEliminacion">Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEliminarPaso2" tabindex="-1" role="dialog" aria-labelledby="tituloEliminar2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-left-danger">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="tituloEliminar2">Confirmacion final</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'eliminar_cuenta' %}" id="formEliminarCuenta">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-danger">Esta accion es definitiva. Para confirmar, escribe tu contraseña actual.</div>
+                    <div class="form-group">
+                        <label for="claveEliminar" class="font-weight-bold">Contraseña actual</label>
+                        <input type="password" name="password" id="claveEliminar" class="form-control" autocomplete="current-password" required>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="entiendoEliminar">
+                        <label class="custom-control-label" for="entiendoEliminar">Entiendo que mi cuenta se eliminara de forma permanente.</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No eliminar</button>
+                    <button type="submit" class="btn btn-danger" id="confirmarEliminacion" disabled>Eliminar mi cuenta definitivamente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if not motivo_bloqueo %}
+<script>
+    $('#abrirEliminarCuenta').on('click', function () {
+        $('#modalEliminarPaso1').modal('show');
+    });
+
+    $('#continuarEliminacion').on('click', function () {
+        encadenarModales('#modalEliminarPaso1', '#modalEliminarPaso2');
+    });
+
+    $('#modalEliminarPaso2').on('show.bs.modal', function () {
+        $('#entiendoEliminar').prop('checked', false);
+        $('#claveEliminar').val('');
+        $('#confirmarEliminacion').prop('disabled', true);
+    });
+
+    $('#entiendoEliminar').on('change', function () {
+        $('#confirmarEliminacion').prop('disabled', !this.checked);
+    });
+</script>
+{% endif %}
 {% endblock %}

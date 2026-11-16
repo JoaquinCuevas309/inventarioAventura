@@ -6,6 +6,10 @@ urlpatterns = [
     path('catalogo/', views.CatalogoView.as_view(), name='catalogo'),
     path('catalogo/<int:pk>/', views.ExperienciaDetalleView.as_view(), name='experiencia_detalle'),
     path('reservar/<int:pk>/', views.ReservarView.as_view(), name='reservar'),
+    path('calendario/', views.CalendarioView.as_view(), name='calendario'),
+    path('experiencias/<int:pk>/grupo/', views.GrupoDetalleView.as_view(), name='grupo_detalle'),
+    path('experiencias/<int:pk>/estado/', views.CambiarEstadoView.as_view(), name='cambiar_estado'),
+    path('experiencias/<int:pk>/visitantes/', views.RegistrarVisitantesView.as_view(), name='registrar_visitantes'),
     path('mis-reservas/', views.MisReservasView.as_view(), name='mis_reservas'),
     path('mis-reservas/<int:pk>/cancelar/', views.CancelarReservaView.as_view(), name='cancelar_reserva'),
 
@@ -23,4 +27,5 @@ urlpatterns = [
     path('reservas/nueva/', views.InscripcionCreateView.as_view(), name='inscripcion_crear'),
     path('reservas/<int:pk>/editar/', views.InscripcionUpdateView.as_view(), name='inscripcion_actualizar'),
     path('reservas/<int:pk>/eliminar/', views.InscripcionDeleteView.as_view(), name='inscripcion_borrar'),
+    path('reservas/<int:pk>/confirmar-pago/', views.ConfirmarPagoView.as_view(), name='confirmar_pago'),
 ]

@@ -73,31 +73,41 @@ ALTER TABLE `experiencias_inscripcion` ADD CONSTRAINT `experiencias_inscrip_expe
 
 ALTER TABLE `experiencias_inscripcion` ADD CONSTRAINT `experiencias_inscrip_usuario_id_9d6f5da2_fk_cuentas_u` FOREIGN KEY (`usuario_id`) REFERENCES `cuentas_usuario` (`id`);
 
+ALTER TABLE `experiencias_experiencia` ADD COLUMN `estado` varchar(15) DEFAULT 'programada' NOT NULL;
+
+ALTER TABLE `experiencias_experiencia` ALTER COLUMN `estado` DROP DEFAULT;
+
+ALTER TABLE `experiencias_inscripcion` ADD COLUMN `asistio` bool DEFAULT 0 NOT NULL;
+
+ALTER TABLE `experiencias_inscripcion` ALTER COLUMN `asistio` DROP DEFAULT;
+
 CREATE TABLE `django_session` (`session_key` varchar(40) NOT NULL PRIMARY KEY, `session_data` longtext NOT NULL, `expire_date` datetime(6) NOT NULL);
 
 CREATE INDEX `django_session_expire_date_a5c62663` ON `django_session` (`expire_date`);
 
 INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
-(1, 'contenttypes', '0001_initial', '2026-11-15 21:53:28.170557'),
-(2, 'contenttypes', '0002_remove_content_type_name', '2026-11-15 21:53:28.183404'),
-(3, 'auth', '0001_initial', '2026-11-15 21:53:28.207145'),
-(4, 'auth', '0002_alter_permission_name_max_length', '2026-11-15 21:53:28.221610'),
-(5, 'auth', '0003_alter_user_email_max_length', '2026-11-15 21:53:28.230668'),
-(6, 'auth', '0004_alter_user_username_opts', '2026-11-15 21:53:28.241018'),
-(7, 'auth', '0005_alter_user_last_login_null', '2026-11-15 21:53:28.250874'),
-(8, 'auth', '0006_require_contenttypes_0002', '2026-11-15 21:53:28.257032'),
-(9, 'auth', '0007_alter_validators_add_error_messages', '2026-11-15 21:53:28.267544'),
-(10, 'auth', '0008_alter_user_username_max_length', '2026-11-15 21:53:28.277970'),
-(11, 'auth', '0009_alter_user_last_name_max_length', '2026-11-15 21:53:28.288485'),
-(12, 'auth', '0010_alter_group_name_max_length', '2026-11-15 21:53:28.305693'),
-(13, 'auth', '0011_update_proxy_permissions', '2026-11-15 21:53:28.317422'),
-(14, 'auth', '0012_alter_user_first_name_max_length', '2026-11-15 21:53:28.329138'),
-(15, 'cuentas', '0001_initial', '2026-11-15 21:53:28.350088'),
-(16, 'admin', '0001_initial', '2026-11-15 21:53:28.369285'),
-(17, 'admin', '0002_logentry_remove_auto_add', '2026-11-15 21:53:28.386763'),
-(18, 'admin', '0003_logentry_add_action_flag_choices', '2026-11-15 21:53:28.399688'),
-(19, 'experiencias', '0001_initial', '2026-11-15 21:53:28.435379'),
-(20, 'sessions', '0001_initial', '2026-11-15 21:53:28.447760');
+(1, 'contenttypes', '0001_initial', '2026-11-16 01:27:52.891839'),
+(2, 'contenttypes', '0002_remove_content_type_name', '2026-11-16 01:27:52.911502'),
+(3, 'auth', '0001_initial', '2026-11-16 01:27:52.939106'),
+(4, 'auth', '0002_alter_permission_name_max_length', '2026-11-16 01:27:52.953499'),
+(5, 'auth', '0003_alter_user_email_max_length', '2026-11-16 01:27:52.964285'),
+(6, 'auth', '0004_alter_user_username_opts', '2026-11-16 01:27:52.979365'),
+(7, 'auth', '0005_alter_user_last_login_null', '2026-11-16 01:27:52.990661'),
+(8, 'auth', '0006_require_contenttypes_0002', '2026-11-16 01:27:52.997359'),
+(9, 'auth', '0007_alter_validators_add_error_messages', '2026-11-16 01:27:53.011351'),
+(10, 'auth', '0008_alter_user_username_max_length', '2026-11-16 01:27:53.021423'),
+(11, 'auth', '0009_alter_user_last_name_max_length', '2026-11-16 01:27:53.034097'),
+(12, 'auth', '0010_alter_group_name_max_length', '2026-11-16 01:27:53.054683'),
+(13, 'auth', '0011_update_proxy_permissions', '2026-11-16 01:27:53.067738'),
+(14, 'auth', '0012_alter_user_first_name_max_length', '2026-11-16 01:27:53.088681'),
+(15, 'cuentas', '0001_initial', '2026-11-16 01:27:53.120826'),
+(16, 'admin', '0001_initial', '2026-11-16 01:27:53.152355'),
+(17, 'admin', '0002_logentry_remove_auto_add', '2026-11-16 01:27:53.179841'),
+(18, 'admin', '0003_logentry_add_action_flag_choices', '2026-11-16 01:27:53.195520'),
+(19, 'experiencias', '0001_initial', '2026-11-16 01:27:53.250585'),
+(20, 'experiencias', '0002_experiencia_estado_inscripcion_asistio', '2026-11-16 01:27:53.320212'),
+(21, 'experiencias', '0003_alter_experiencia_categoria_and_more', '2026-11-16 01:27:53.425312'),
+(22, 'sessions', '0001_initial', '2026-11-16 01:27:53.444589');
 
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (1, 'admin', 'logentry'),
@@ -149,11 +159,11 @@ INSERT INTO `auth_permission` (`id`, `content_type_id`, `codename`, `name`) VALU
 (36, 9, 'view_inscripcion', 'Can view Inscripcion');
 
 INSERT INTO `cuentas_usuario` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `rol`, `telefono`) VALUES
-(1, 'pbkdf2_sha256$1500000$r2Wjv3VidC1aaHm5Nxr9N8$gopqfeab2IFly+CIHSsbbXQ9Da/arkPmLL9oH0oMERE=', NULL, 1, 'admin_aventura', 'Admin', 'Aventura', 'admin@aventuradelsur.cl', 1, 1, '2026-11-15 21:53:30.310301', 'admin', ''),
-(2, 'pbkdf2_sha256$1500000$aZxD8tiAZQ8iWVhIrDEFtS$5YWexRAFgDLxMaUzdZsIu0gvVVjdzO5qL/gDdxaLSTs=', NULL, 0, 'guia_marcela', 'Marcela', 'Rojas', 'guia_marcela@aventuradelsur.cl', 0, 1, '2026-11-15 21:53:31.480920', 'guia', ''),
-(3, 'pbkdf2_sha256$1500000$iuCy9FqKQMCJHJdPEe02rt$z32ipegjZFWx/D2gPuV2Awsp0czCTXrjS81kzXh2rBA=', NULL, 0, 'guia_tomas', 'Tomas', 'Vidal', 'guia_tomas@aventuradelsur.cl', 0, 1, '2026-11-15 21:53:32.831385', 'guia', ''),
-(4, 'pbkdf2_sha256$1500000$hq4i4lkyoryFYFI205T0VQ$7KP7VU2vlFG9ECGFxINH2UnoEKJBO1IW5VQeGDNSAMc=', NULL, 0, 'turista_ana', 'Ana', 'Soto', 'turista_ana@correo.cl', 0, 1, '2026-11-15 21:53:34.208299', 'turista', ''),
-(5, 'pbkdf2_sha256$1500000$AOmHHOUkqb86B0gWIeNRfM$0pzYML7EN/Wy9O6kQw++otU85IuZSQ+uREgBNTR8G+4=', NULL, 0, 'turista_luis', 'Luis', 'Pino', 'turista_luis@correo.cl', 0, 1, '2026-11-15 21:53:35.598969', 'turista', '');
+(1, 'pbkdf2_sha256$1500000$mGEs3IrM25ebsmCxNDoPkd$MDpShr87pM0SEqkwJvBQrVFjK4zd3K/W+5i+GUgVVtU=', NULL, 1, 'admin_aventura', 'Admin', 'Aventura', 'admin@aventuradelsur.cl', 1, 1, '2026-11-16 01:27:56.114882', 'admin', ''),
+(2, 'pbkdf2_sha256$1500000$OpZvO5efU9vg0IgdSomV8e$8IZM/CJVOgz/D3R6eeT2n2PoPAWrxBEnvZi7GYvdWxA=', NULL, 0, 'guia_marcela', 'Marcela', 'Rojas', 'guia_marcela@aventuradelsur.cl', 0, 1, '2026-11-16 01:27:57.586291', 'guia', ''),
+(3, 'pbkdf2_sha256$1500000$Y9ehJ3IEffRUZs5vlNsU0l$ZbfMku4xPk9gyqF67JaUmoRn5k6wMiYuqqDLLWhOthY=', NULL, 0, 'guia_tomas', 'Tomas', 'Vidal', 'guia_tomas@aventuradelsur.cl', 0, 1, '2026-11-16 01:27:59.312160', 'guia', ''),
+(4, 'pbkdf2_sha256$1500000$MrSdmwFxhgVU4osi3y0Lcc$LTZGnliHk8zqN7hs1O6Jz494kROh8yLrFWHWngxj09c=', NULL, 0, 'turista_ana', 'Ana', 'Soto', 'turista_ana@correo.cl', 0, 1, '2026-11-16 01:28:01.150335', 'turista', ''),
+(5, 'pbkdf2_sha256$1500000$3MIWh0gJwNytKcunGgzVni$YW/a072OCX0OY/aQbno9GS/xu3YIeo6YNr3208ULzYM=', NULL, 0, 'turista_luis', 'Luis', 'Pino', 'turista_luis@correo.cl', 0, 1, '2026-11-16 01:28:02.798834', 'turista', '');
 
 INSERT INTO `experiencias_categoria` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (1, 'Trekking', 'Rutas de caminata guiadas por senderos del ecoparque.', 1),
@@ -161,22 +171,34 @@ INSERT INTO `experiencias_categoria` (`id`, `nombre`, `descripcion`, `activo`) V
 (3, 'Arriendo de equipos', 'Arriendo de equipo tecnico para actividades al aire libre.', 1),
 (4, 'Kayak', 'Recorridos en kayak por el lago y el rio.', 1);
 
-INSERT INTO `experiencias_experiencia` (`id`, `titulo`, `descripcion`, `precio`, `cupo_maximo`, `fecha_hora`, `activa`, `categoria_id`, `creador_id`) VALUES
-(1, 'Trekking Sendero del Bosque Nativo', 'Trekking Sendero del Bosque Nativo. Actividad guiada con equipo de seguridad incluido.', 12000, 15, '2027-02-13 21:53:37.204664', 1, 1, 2),
-(2, 'Trekking Cumbre del Mirador', 'Trekking Cumbre del Mirador. Actividad guiada con equipo de seguridad incluido.', 18000, 10, '2027-02-14 21:53:37.204664', 1, 1, 2),
-(3, 'Canopy Circuito Alto', 'Canopy Circuito Alto. Actividad guiada con equipo de seguridad incluido.', 25000, 8, '2027-02-15 21:53:37.204664', 1, 2, 2),
-(4, 'Arriendo de Equipo Completo de Montaña', 'Arriendo de Equipo Completo de Montaña. Actividad guiada con equipo de seguridad incluido.', 9000, 20, '2027-02-16 21:53:37.204664', 1, 3, 2),
-(5, 'Kayak Laguna Esmeralda', 'Kayak Laguna Esmeralda. Actividad guiada con equipo de seguridad incluido.', 20000, 12, '2027-02-17 21:53:37.204664', 1, 4, 3),
-(6, 'Kayak Rio Sereno al Atardecer', 'Kayak Rio Sereno al Atardecer. Actividad guiada con equipo de seguridad incluido.', 22000, 10, '2027-02-18 21:53:37.204664', 1, 4, 3),
-(7, 'Canopy Circuito Infantil', 'Canopy Circuito Infantil. Actividad guiada con equipo de seguridad incluido.', 15000, 12, '2027-02-19 21:53:37.204664', 1, 2, 3),
-(8, 'Trekking Nocturno de Fauna', 'Trekking Nocturno de Fauna. Actividad guiada con equipo de seguridad incluido.', 16000, 8, '2027-02-20 21:53:37.204664', 1, 1, 3);
+INSERT INTO `experiencias_experiencia` (`id`, `titulo`, `descripcion`, `precio`, `cupo_maximo`, `fecha_hora`, `activa`, `categoria_id`, `estado`, `creador_id`) VALUES
+(1, 'Trekking Sendero del Bosque Nativo', 'Trekking Sendero del Bosque Nativo. Actividad guiada con equipo de seguridad incluido.', 12000, 15, '2027-02-14 01:28:04.404846', 1, 1, 'programada', 2),
+(2, 'Trekking Cumbre del Mirador', 'Trekking Cumbre del Mirador. Actividad guiada con equipo de seguridad incluido.', 18000, 10, '2027-02-15 01:28:04.404846', 1, 1, 'programada', 2),
+(3, 'Canopy Circuito Alto', 'Canopy Circuito Alto. Actividad guiada con equipo de seguridad incluido.', 25000, 8, '2027-02-16 01:28:04.404846', 1, 2, 'programada', 2),
+(4, 'Arriendo de Equipo Completo de Montaña', 'Arriendo de Equipo Completo de Montaña. Actividad guiada con equipo de seguridad incluido.', 9000, 20, '2027-02-17 01:28:04.404846', 1, 3, 'programada', 2),
+(5, 'Kayak Laguna Esmeralda', 'Kayak Laguna Esmeralda. Actividad guiada con equipo de seguridad incluido.', 20000, 12, '2027-02-18 01:28:04.404846', 1, 4, 'programada', 3),
+(6, 'Kayak Rio Sereno al Atardecer', 'Kayak Rio Sereno al Atardecer. Actividad guiada con equipo de seguridad incluido.', 22000, 10, '2027-02-19 01:28:04.404846', 1, 4, 'programada', 3),
+(7, 'Canopy Circuito Infantil', 'Canopy Circuito Infantil. Actividad guiada con equipo de seguridad incluido.', 15000, 12, '2027-02-20 01:28:04.404846', 1, 2, 'programada', 3),
+(8, 'Trekking Nocturno de Fauna', 'Trekking Nocturno de Fauna. Actividad guiada con equipo de seguridad incluido.', 16000, 8, '2027-02-21 01:28:04.404846', 1, 1, 'programada', 3),
+(9, 'Trekking Amanecer en el Volcan', 'Trekking Amanecer en el Volcan. Actividad guiada con equipo de seguridad incluido.', 15000, 10, '2026-11-15 23:28:04.404846', 1, 1, 'en_curso', 2),
+(10, 'Canopy Circuito Clasico del Mes Pasado', 'Canopy Circuito Clasico del Mes Pasado. Actividad guiada con equipo de seguridad incluido.', 24000, 8, '2026-11-06 01:28:04.404846', 1, 2, 'finalizada', 2),
+(11, 'Kayak Rio Calle Calle Matutino', 'Kayak Rio Calle Calle Matutino. Actividad guiada con equipo de seguridad incluido.', 21000, 10, '2026-11-15 22:28:04.404846', 1, 4, 'en_curso', 3),
+(12, 'Trekking Laguna Verde del Mes Pasado', 'Trekking Laguna Verde del Mes Pasado. Actividad guiada con equipo de seguridad incluido.', 13000, 12, '2026-11-04 01:28:04.404846', 1, 1, 'finalizada', 3);
 
-INSERT INTO `experiencias_inscripcion` (`id`, `fecha_inscripcion`, `estado_pago`, `experiencia_id`, `usuario_id`) VALUES
-(1, '2026-11-15 21:53:37.284420', 'confirmado', 1, 4),
-(2, '2026-11-15 21:53:37.296118', 'pendiente', 2, 4),
-(3, '2026-11-15 21:53:37.307477', 'pendiente', 3, 4),
-(4, '2026-11-15 21:53:37.317341', 'confirmado', 4, 5),
-(5, '2026-11-15 21:53:37.327001', 'pendiente', 5, 5),
-(6, '2026-11-15 21:53:37.336356', 'pendiente', 6, 5);
+INSERT INTO `experiencias_inscripcion` (`id`, `fecha_inscripcion`, `estado_pago`, `experiencia_id`, `asistio`, `usuario_id`) VALUES
+(1, '2026-11-16 01:28:04.491853', 'confirmado', 1, 0, 4),
+(2, '2026-11-16 01:28:04.502234', 'pendiente', 2, 0, 4),
+(3, '2026-11-16 01:28:04.512115', 'pendiente', 3, 0, 4),
+(4, '2026-11-16 01:28:04.522121', 'confirmado', 4, 0, 5),
+(5, '2026-11-16 01:28:04.532455', 'pendiente', 5, 0, 5),
+(6, '2026-11-16 01:28:04.544921', 'pendiente', 6, 0, 5),
+(7, '2026-11-16 01:28:04.562963', 'confirmado', 9, 0, 4),
+(8, '2026-11-16 01:28:04.577650', 'pendiente', 9, 0, 5),
+(9, '2026-11-16 01:28:04.596856', 'confirmado', 10, 1, 4),
+(10, '2026-11-16 01:28:04.607915', 'confirmado', 10, 0, 5),
+(11, '2026-11-16 01:28:04.628218', 'confirmado', 11, 0, 4),
+(12, '2026-11-16 01:28:04.639079', 'pendiente', 11, 0, 5),
+(13, '2026-11-16 01:28:04.660002', 'confirmado', 12, 1, 4),
+(14, '2026-11-16 01:28:04.670396', 'confirmado', 12, 0, 5);
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1,0 +1,48 @@
+{% extends 'base_panel.html' %}
+
+{% block title %}Registrar visitantes{% endblock %}
+
+{% block contenido %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 text-gray-800">Registrar visitantes</h1>
+        <p class="mb-0 text-muted">
+            {{ experiencia.titulo }} &middot; {{ experiencia.fecha_hora|date:"d/m/Y H:i" }}
+            {% include 'includes/estado_ruta.html' with ruta=experiencia %}
+        </p>
+    </div>
+    <a href="{% url 'grupo_detalle' experiencia.pk %}" class="btn btn-outline-secondary btn-sm shadow-sm">Volver al grupo</a>
+</div>
+
+{% if not experiencia.admite_registro_de_visitantes %}
+    <div class="alert alert-warning">Inicia la ruta antes de registrar visitantes. Mientras este programada o suspendida no se puede tomar asistencia.</div>
+{% endif %}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-success">Marca a los visitantes que se presentaron</h6>
+    </div>
+    <div class="card-body">
+        <form method="post" id="formVisitantes">
+            {% csrf_token %}
+            {% for inscripcion in inscripciones %}
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" name="asistieron" value="{{ inscripcion.pk }}" id="visitante{{ inscripcion.pk }}" {% if inscripcion.asistio %}checked{% endif %} {% if not experiencia.admite_registro_de_visitantes %}disabled{% endif %}>
+                    <label class="custom-control-label" for="visitante{{ inscripcion.pk }}">
+                        <strong>{{ inscripcion.usuario.get_full_name|default:inscripcion.usuario.username }}</strong>
+                        <span class="text-muted small">({{ inscripcion.usuario.email }}) &middot; pago {{ inscripcion.get_estado_pago_display|lower }}</span>
+                    </label>
+                </div>
+            {% empty %}
+                <p class="text-muted mb-0">Esta ruta aun no tiene reservas.</p>
+            {% endfor %}
+            {% if inscripciones %}
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'grupo_detalle' experiencia.pk %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-success" {% if not experiencia.admite_registro_de_visitantes %}disabled{% endif %}>Guardar asistencia</button>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}

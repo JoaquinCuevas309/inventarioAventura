@@ -4,57 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Aventuras del Sur{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    {% include 'includes/estilos_publico.html' %}
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'inicio' %}">Aventuras del Sur</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="menuPrincipal">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'inicio' %}">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Actividades</a></li>
-                </ul>
-                <ul class="navbar-nav align-items-lg-center">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'panel' %}">Mi Panel ({{ user.get_rol_display }})</a></li>
-                        <li class="nav-item">
-                            <form method="post" action="{% url 'logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesion</button>
-                            </form>
-                        </li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'registro' %}">Registrarse</a></li>
-                        <li class="nav-item"><a class="btn btn-light btn-sm" href="{% url 'login' %}">Ingresar</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+    {% include 'includes/header_publico.html' %}
 
     <main class="flex-grow-1">
-        {% if messages %}
-            <div class="container mt-3">
-                {% for mensaje in messages %}
-                    <div class="alert alert-{% if mensaje.tags == 'error' %}danger{% else %}{{ mensaje.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                        {{ mensaje }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% include 'includes/mensajes_publico.html' %}
         {% block contenido %}
         {% endblock %}
     </main>
 
-    <footer class="bg-dark text-white-50 text-center py-3 mt-4">
-        <small>Ecoparque y Reserva Natural Aventuras del Sur &copy; {% now "Y" %}</small>
-    </footer>
+    {% include 'includes/footer_publico.html' %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    {% include 'includes/scripts_publico.html' %}
+    {% block scripts %}
+    {% endblock %}
 </body>
 </html>

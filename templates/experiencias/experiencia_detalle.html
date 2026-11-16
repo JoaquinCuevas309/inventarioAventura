@@ -22,6 +22,8 @@
                 {% if user.rol == 'turista' %}
                     {% if ya_reservada %}
                         <div class="alert alert-info mb-0">Ya tienes una reserva para esta actividad. Revisa su estado en <a href="{% url 'mis_reservas' %}">Mis Reservas</a>.</div>
+                    {% elif experiencia.estado != 'programada' %}
+                        <div class="alert alert-secondary mb-0">Esta ruta esta {{ experiencia.get_estado_display|lower }} y no admite reservas.</div>
                     {% elif experiencia.ya_realizada %}
                         <div class="alert alert-secondary mb-0">Esta actividad ya se realizo y no admite reservas.</div>
                     {% elif experiencia.cupos_disponibles == 0 %}

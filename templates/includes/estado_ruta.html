@@ -1,0 +1,1 @@
+<span class="badge badge-{% if ruta.estado == 'programada' %}primary{% elif ruta.estado == 'en_curso' %}success{% elif ruta.estado == 'finalizada' %}secondary{% else %}danger{% endif %}">{{ ruta.get_estado_display }}</span>
